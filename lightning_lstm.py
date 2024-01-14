@@ -17,6 +17,7 @@ class LightningLSTM(L.LightningModule):
         ## We have only 1 feature for each company (DAY), therefore we use input size=1
         ## We have only 1 output for each company (prediction for day 5), therefor we use hidden_size=1
         ## If we want to plug outputs to another NN, we can use different hidden size (f.e. for simple nn)
+        L.seed_everything(seed=42)
         self.lstm = nn.LSTM(input_size=1, hidden_size=1)
 
 
@@ -69,8 +70,8 @@ def main():
     print("Company A: Observed = 0, Predicted =", model(torch.tensor([0., 0.5, 0.25, 1.])).detach())
     print("Company B: Observed = 1, Predicted =", model(torch.tensor([1., 0.5, 0.25, 1.])).detach())
 
-    trainer = L.Trainer(max_epochs=300, logger=logger, log_every_n_steps=2)
-    #trainer.fit(model, train_dataloaders=dataloader)
+    trainer = L.Trainer(max_epochs=200, logger=logger, log_every_n_steps=2)
+    trainer.fit(model, train_dataloaders=dataloader)
 
     print("After training, the parameters are: ")
     for name, params in model.named_parameters():
@@ -81,7 +82,7 @@ def main():
 
     ## Below we will continue training from the last checkpoint
     path_to_best_checkpoint = trainer.checkpoint_callback.best_model_path # best_model_path refers to last checkpoint
-    trainer = L.Trainer(max_epochs=1000, logger=logger, log_every_n_steps=2)
+    trainer = L.Trainer(max_epochs=1200, logger=logger, log_every_n_steps=2)
     trainer.fit(model, train_dataloaders=dataloader, ckpt_path=path_to_best_checkpoint)
 
     print("After post-training, the parameters are: ")
